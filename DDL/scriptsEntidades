@@ -1,0 +1,96 @@
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+
+
+CREATE TABLE companies (
+    company_id UUID DEFAULT gen_random_uuid(),
+    cnpj VARCHAR(14) NOT NULL,
+    legal_name VARCHAR(255) NOT NULL,          -- Nome jurídico oficial (sem abreviação)
+    trade_name VARCHAR(255),                   -- Nome fantasia comercial
+    timezone_name VARCHAR(50) NOT NULL DEFAULT 'America/Sao_Paulo',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Constraints
+    CONSTRAINT pk_companies PRIMARY KEY (company_id),
+    CONSTRAINT uq_companies_cnpj UNIQUE (cnpj)
+);
+
+CREATE INDEX idx_companies_cnpj ON companies (cnpj);
+
+
+
+CREATE TABLE employees (
+    employee_id UUID DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL,                  -- Nome idêntico a companies.company_id
+    cpf VARCHAR(11) NOT NULL,
+    pis VARCHAR(11) NOT NULL,
+    registration_code VARCHAR(50) NOT NULL,    -- Código de matrícula claro e sem ambiguidade
+    admission_date DATE NOT NULL,              -- Sufixo _date explícito
+    resignation_date DATE,
+    biometric_template TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,   -- Prefixo booleano is_
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Constraints
+    CONSTRAINT pk_employees PRIMARY KEY (employee_id),
+    CONSTRAINT fk_employees_companies FOREIGN KEY (company_id) 
+        REFERENCES companies (company_id) ON DELETE RESTRICT,
+    CONSTRAINT uq_employees_cpf UNIQUE (cpf),
+    CONSTRAINT uq_employees_pis UNIQUE (pis),
+    CONSTRAINT uq_employees_company_registration UNIQUE (company_id, registration_code)
+);
+
+CREATE INDEX idx_employees_company_id ON employees (company_id);
+CREATE INDEX idx_employees_cpf ON employees (cpf);
+CREATE INDEX idx_employees_is_active ON employees (is_active);
+
+
+CREATE TABLE work_shifts (
+    work_shift_id UUID DEFAULT gen_random_uuid(),
+    company_id UUID NOT NULL,                  -- FK idêntica à PK
+    shift_name VARCHAR(100) NOT NULL,          -- Nome descritivo (evita 'name' genérico)
+    shift_type VARCHAR(30) NOT NULL,          -- Tipo específico (evita 'type' genérico)
+    expected_daily_minutes INTEGER NOT NULL DEFAULT 480, -- Unidade explícita (_minutes)
+    tolerance_minutes INTEGER NOT NULL DEFAULT 5,        -- Unidade explícita (_minutes)
+    has_night_shift_bonus BOOLEAN NOT NULL DEFAULT TRUE, -- Prefixo booleano has_
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Constraints
+    CONSTRAINT pk_work_shifts PRIMARY KEY (work_shift_id),
+    CONSTRAINT fk_work_shifts_companies FOREIGN KEY (company_id) 
+        REFERENCES companies (company_id) ON DELETE RESTRICT,
+    CONSTRAINT chk_work_shifts_shift_type CHECK (shift_type IN ('fixo', '12x36', 'flexivel', 'revezamento'))
+);
+
+CREATE INDEX idx_work_shifts_company_id ON work_shifts (company_id);
+
+
+CREATE TABLE timesheet_closures (
+    timesheet_closure_id UUID DEFAULT gen_random_uuid(),
+    employee_id UUID NOT NULL,                 -- FK idêntica a employees.employee_id
+    period_start_date DATE NOT NULL,           -- Sufixo _date explícito
+    period_end_date DATE NOT NULL,             -- Sufixo _date explícito
+    total_worked_hours NUMERIC(6, 2) NOT NULL DEFAULT 0.00,   -- Unidade explícita (_hours)
+    total_overtime_hours NUMERIC(6, 2) NOT NULL DEFAULT 0.00, -- Unidade explícita (_hours)
+    total_absence_hours NUMERIC(6, 2) NOT NULL DEFAULT 0.00,  -- Unidade explícita (_hours)
+    employee_signed_at TIMESTAMPTZ,            -- Sufixo _at para timestamp exato
+    manager_signed_at TIMESTAMPTZ,             -- Sufixo _at para timestamp exato
+    closure_status VARCHAR(20) NOT NULL DEFAULT 'aberto',     -- Nome contextualizado (evita 'status')
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Constraints
+    CONSTRAINT pk_timesheet_closures PRIMARY KEY (timesheet_closure_id),
+    CONSTRAINT fk_timesheet_closures_employees FOREIGN KEY (employee_id) 
+        REFERENCES employees (employee_id) ON DELETE RESTRICT,
+    CONSTRAINT chk_timesheet_closures_status CHECK (closure_status IN ('aberto', 'em_aprovacao', 'fechado')),
+    CONSTRAINT chk_timesheet_closures_date_range CHECK (period_start_date <= period_end_date),
+    CONSTRAINT uq_timesheet_closures_employee_period UNIQUE (employee_id, period_start_date, period_end_date)
+);
+
+CREATE INDEX idx_timesheet_closures_employee_period ON timesheet_closures (employee_id, period_start_date, period_end_date);
+CREATE INDEX idx_timesheet_closures_closure_status ON timesheet_closures (closure_status);
