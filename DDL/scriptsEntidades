@@ -17,7 +17,7 @@ CREATE TABLE companies (
     CONSTRAINT uq_companies_cnpj UNIQUE (cnpj)
 );
 
-CREATE INDEX idx_companies_cnpj ON companies (cnpj);
+
 
 
 
@@ -43,10 +43,6 @@ CREATE TABLE employees (
     CONSTRAINT uq_employees_company_registration UNIQUE (company_id, registration_code)
 );
 
-CREATE INDEX idx_employees_company_id ON employees (company_id);
-CREATE INDEX idx_employees_cpf ON employees (cpf);
-CREATE INDEX idx_employees_is_active ON employees (is_active);
-
 
 CREATE TABLE work_shifts (
     work_shift_id UUID DEFAULT gen_random_uuid(),
@@ -66,7 +62,7 @@ CREATE TABLE work_shifts (
     CONSTRAINT chk_work_shifts_shift_type CHECK (shift_type IN ('fixo', '12x36', 'flexivel', 'revezamento'))
 );
 
-CREATE INDEX idx_work_shifts_company_id ON work_shifts (company_id);
+
 
 
 CREATE TABLE timesheet_closures (
@@ -92,5 +88,3 @@ CREATE TABLE timesheet_closures (
     CONSTRAINT uq_timesheet_closures_employee_period UNIQUE (employee_id, period_start_date, period_end_date)
 );
 
-CREATE INDEX idx_timesheet_closures_employee_period ON timesheet_closures (employee_id, period_start_date, period_end_date);
-CREATE INDEX idx_timesheet_closures_closure_status ON timesheet_closures (closure_status);
