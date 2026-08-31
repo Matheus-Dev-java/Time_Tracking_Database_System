@@ -1,6 +1,7 @@
-CREATE TABLE companies (
+﻿CREATE TABLE companies (
     id   BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     cnpj VARCHAR(255) NOT NULL
 );
 ALTER TABLE companies ADD PRIMARY KEY (id);
+
