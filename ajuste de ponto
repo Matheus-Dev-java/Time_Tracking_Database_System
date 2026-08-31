@@ -1,21 +1,21 @@
 
 CREATE TABLE ajustes_ponto (
-    id                 BIGINT       NOT NULL,
-    data_hora_ajustada TIMESTAMP    NOT NULL,
-    tipo_ajuste        VARCHAR(50)  NOT NULL,
-    motivo             TEXT         NOT NULL,
-    status             VARCHAR(50)  NOT NULL 
+    id BIGINT NOT NULL,
+    data_hora_ajustada TIMESTAMP NOT NULL,
+    tipo_ajuste VARCHAR(50) NOT NULL,
+    motivo TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL 
 );
 ALTER TABLE ajustes_ponto ADD PRIMARY KEY (id);
 
 CREATE TABLE afastamentos (
-    id               BIGINT       NOT NULL,
-    data_inicio      DATE         NOT NULL,
-    data_fim         DATE         NOT NULL,
+    id  BIGINT NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE NOT NULL,
     tipo_afastamento VARCHAR(100) NOT NULL,
-    codigo_cid       VARCHAR(20),
-    url_documento    VARCHAR(255),
-    status           VARCHAR(50)  NOT NULL
+    codigo_cid VARCHAR(20),
+    url_documento VARCHAR(255),
+    status VARCHAR(50)  NOT NULL
 );
 ALTER TABLE afastamentos ADD PRIMARY KEY (id);
 
