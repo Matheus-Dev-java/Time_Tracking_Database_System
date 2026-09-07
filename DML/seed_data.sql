@@ -53,7 +53,7 @@ INSERT INTO job_titles (id, name, cbo) VALUES
 -- -----------------------------------------------------------------------------
 -- 5. SHIFTS (Turnos de Trabalho)
 -- -----------------------------------------------------------------------------
-INSERT INTO shifts (id, name, clock_in_time, beak_start_time, break_end_time, clock_out_time, tolerance_minutes) VALUES
+INSERT INTO shifts (id, name, clock_in_time, break_start_time, break_end_time, clock_out_time, tolerance_minutes) VALUES
 (1, 'Comercial Padrão 8h (08h às 17h)', '08:00:00', '12:00:00', '13:00:00', '17:00:00', 10),
 (2, 'Administrativo Flex (09h às 18h)', '09:00:00', '13:00:00', '14:00:00', '18:00:00', 15),
 (3, 'Turno Manhã Operacional (06h às 14h)', '06:00:00', '10:00:00', '11:00:00', '14:00:00', 10),
