@@ -1,0 +1,14 @@
+CREATE TABLE employee_shifts (
+    id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL,
+    shift_id BIGINT NOT NULL,
+    start_date DATE NOT NULL,
+end_date DATE 
+);
+ALTER TABLE employee_shifts ADD PRIMARY KEY (id);
+ALTER TABLE employee_shifts 
+    ADD CONSTRAINT fk_employee_shifts_employees 
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
+ALTER TABLE employee_shifts 
+    ADD CONSTRAINT fk_employee_shifts_shifts 
+    FOREIGN KEY (shift_id) REFERENCES shifts(id);
