@@ -1,0 +1,16 @@
+CREATE TABLE daily_time_records (
+    id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL,
+    record_date DATE NOT NULL,
+    worked_minutes INTEGER NOT NULL DEFAULT 0,
+    expected_minutes INTEGER NOT NULL DEFAULT 0,
+    overtime_minutes INTEGER NOT NULL DEFAULT 0, 
+    absence_minutes INTEGER NOT NULL DEFAULT 0,   
+    status VARCHAR(50) NOT NULL                  
+);
+ALTER TABLE daily_time_records ADD PRIMARY KEY (id);
+ALTER TABLE daily_time_records ADD CONSTRAINT uq_employee_daily_record UNIQUE (employee_id, record_date);
+
+ALTER TABLE daily_time_records 
+    ADD CONSTRAINT fk_daily_time_records_employees 
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
