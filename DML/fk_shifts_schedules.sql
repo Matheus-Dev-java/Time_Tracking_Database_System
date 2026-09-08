@@ -3,7 +3,7 @@ INSERT INTO shifts (id, name, clock_in_time, break_start_time, break_end_time, c
 (2, 'Tarde', '14:00:00', '18:00:00', '18:15:00', '22:00:00', 10),
 (3, 'Noite', '22:00:00', '02:00:00', '02:15:00', '06:00:00', 15),
 (4, 'Comercial Integral', '08:00:00', '12:00:00', '13:00:00', '18:00:00', 10),
-(5, 'Home Office Flex',     '09:00:00', '12:00:00', '13:00:00', '18:00:00', 15
+(5, 'Home Office Flex', '09:00:00', '12:00:00', '13:00:00', '18:00:00', 15
 
 INSERT INTO schedules (id, shift_name, workload, employee_id) VALUES
 (1,  'Comercial Integral', 220, 1),
