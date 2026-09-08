@@ -21,7 +21,7 @@ INSERT INTO schedules (id, shift_name, workload, employee_id) VALUES
 (13, 'Manhã', 180, 13),
 (14, 'Tarde', 180, 14),
 (15, 'Comercial Integral', 220, 15),
-(16, 'Noite',                180, 16),
+(16, 'Noite', 180, 16),
 (17, 'Home Office Flex',   160, 17),
 (18, 'Comercial Integral', 220, 18),
 (19, 'Manhã',                180, 19),
