@@ -1,0 +1,13 @@
+CREATE TABLE time_clocks (
+    id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL,
+    clock_time TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+    clock_type VARCHAR(20) NOT NULL, 
+    origin VARCHAR(50) NOT NULL,    
+    latitude DECIMAL(10, 8),       
+    longitude DECIMAL(11, 8)
+);
+ALTER TABLE time_clocks ADD PRIMARY KEY (id);
+ALTER TABLE time_clocks 
+    ADD CONSTRAINT fk_time_clocks_employees 
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
