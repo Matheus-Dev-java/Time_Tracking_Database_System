@@ -8,7 +8,7 @@ INSERT INTO shifts (id, name, clock_in_time, break_start_time, break_end_time, c
 INSERT INTO schedules (id, shift_name, workload, employee_id) VALUES
 (1,  'Comercial Integral', 220, 1),
 (2,  'Manhã', 180, 2),
-(3,  'Tarde',               180, 3),
+(3,  'Tarde', 180, 3),
 (4,  'Noite',                180, 4),
 (5,  'Comercial Integral', 220, 5),
 (6,  'Home Office Flex',   160, 6),
