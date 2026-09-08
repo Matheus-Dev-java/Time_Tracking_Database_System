@@ -1,0 +1,20 @@
+CREATE TABLE time_adjustments (
+    id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL,
+    daily_record_id BIGINT NOT NULL,
+    reason VARCHAR(255) NOT NULL,        
+    document_proof_url VARCHAR(500),     
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    reviewed_by BIGINT,                 
+    created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE time_adjustments ADD PRIMARY KEY (id);
+ALTER TABLE time_adjustments 
+    ADD CONSTRAINT fk_time_adjustments_employees 
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
+ALTER TABLE time_adjustments 
+    ADD CONSTRAINT fk_time_adjustments_daily_records 
+    FOREIGN KEY (daily_record_id) REFERENCES daily_time_records(id) ON DELETE CASCADE;
+ALTER TABLE time_adjustments 
+    ADD CONSTRAINT fk_time_adjustments_reviewer 
+    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL;
