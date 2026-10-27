@@ -1,0 +1,121 @@
+CREATE TABLE colaborador (
+    id     serial PRIMARY KEY,
+    nome   text    NOT NULL,
+    ativo  boolean NOT NULL DEFAULT true
+);
+
+CREATE TABLE local_trabalho (
+    id           serial PRIMARY KEY,
+    nome         text   NOT NULL,
+    latitude     double precision NOT NULL,
+    longitude    double precision NOT NULL,
+    raio_metros  integer NOT NULL DEFAULT 100 CHECK (raio_metros > 0),
+    faixa_ip     cidr                      -- ex.: 200.10.0.0/24
+);
+
+CREATE TABLE colaborador_local (
+    colaborador_id integer REFERENCES colaborador(id),
+    local_id       integer REFERENCES local_trabalho(id),
+    PRIMARY KEY (colaborador_id, local_id)
+);
+
+CREATE TABLE escala_trabalho (
+    id                serial PRIMARY KEY,
+    nome              text    NOT NULL,
+    carga_diaria_min  integer NOT NULL CHECK (carga_diaria_min > 0),
+    intervalo_min     integer NOT NULL DEFAULT 60,
+    dias_semana       integer[] NOT NULL DEFAULT '{1,2,3,4,5}'  -- ISO: 1=seg ... 7=dom
+);
+
+-- vigência das escalas por colaborador (data_fim NULL = vigente)
+CREATE TABLE colaborador_escala (
+    id             serial PRIMARY KEY,
+    colaborador_id integer NOT NULL REFERENCES colaborador(id),
+    escala_id      integer NOT NULL REFERENCES escala_trabalho(id),
+    data_inicio    date    NOT NULL,
+    data_fim       date,
+    CHECK (data_fim IS NULL OR data_fim >= data_inicio)
+);
+
+CREATE TABLE historico_jornada (
+    id                 serial PRIMARY KEY,
+    colaborador_id     integer NOT NULL REFERENCES colaborador(id),
+    escala_anterior_id integer REFERENCES escala_trabalho(id),
+    escala_nova_id     integer NOT NULL REFERENCES escala_trabalho(id),
+    data_inicio        date    NOT NULL,
+    registrado_em      timestamp NOT NULL DEFAULT now()
+);
+
+CREATE TABLE marcacao_ponto (
+    id             bigserial PRIMARY KEY,
+    nsr            bigint GENERATED ALWAYS AS IDENTITY,   -- Nº Sequencial de Registro
+    colaborador_id integer   NOT NULL REFERENCES colaborador(id),
+    data_hora      timestamp NOT NULL,
+    latitude       double precision,
+    longitude      double precision,
+    ip_origem      inet,
+    local_id       integer REFERENCES local_trabalho(id),  -- local validado (se houver)
+    divergente     boolean NOT NULL DEFAULT false
+);
+CREATE INDEX ix_marcacao_colab_data ON marcacao_ponto (colaborador_id, data_hora);
+
+CREATE TABLE alerta_marcacao (
+    id          bigserial PRIMARY KEY,
+    marcacao_id bigint NOT NULL REFERENCES marcacao_ponto(id),
+    tipo        text   NOT NULL,   -- GEO_AUSENTE | GEO_FORA_PERIMETRO | IP_NAO_AUTORIZADO
+    descricao   text,
+    criado_em   timestamp NOT NULL DEFAULT now()
+);
+
+CREATE TABLE abono (
+    id             bigserial PRIMARY KEY,
+    colaborador_id integer NOT NULL REFERENCES colaborador(id),
+    data_ref       date    NOT NULL,
+    tipo           text    NOT NULL CHECK (tipo IN ('FALTA','ATRASO')),
+    minutos        integer NOT NULL CHECK (minutos > 0),
+    motivo         text    NOT NULL,
+    documento      text    NOT NULL,          -- nº/descrição do atestado ou justificativa
+    status         text    NOT NULL DEFAULT 'APROVADO',
+    criado_em      timestamp NOT NULL DEFAULT now()
+);
+
+CREATE TABLE espelho_ponto (
+    id               serial PRIMARY KEY,
+    colaborador_id   integer NOT NULL REFERENCES colaborador(id),
+    ano              integer NOT NULL,
+    mes              integer NOT NULL CHECK (mes BETWEEN 1 AND 12),
+    min_trabalhados  integer NOT NULL DEFAULT 0,
+    min_extras       integer NOT NULL DEFAULT 0,
+    horas_noturnas   numeric(10,2) NOT NULL DEFAULT 0,   -- já com redução (52,5 min)
+    qtd_faltas       integer NOT NULL DEFAULT 0,
+    min_devidos      integer NOT NULL DEFAULT 0,
+    fechado          boolean NOT NULL DEFAULT false,
+    fechado_em       timestamp,
+    atualizado_em    timestamp NOT NULL DEFAULT now(),
+    UNIQUE (colaborador_id, ano, mes)
+);
+
+-- minutos > 0 = crédito; minutos < 0 = débito
+CREATE TABLE banco_horas_mov (
+    id             bigserial PRIMARY KEY,
+    colaborador_id integer NOT NULL REFERENCES colaborador(id),
+    data_ref       date    NOT NULL,
+    minutos        integer NOT NULL CHECK (minutos <> 0),
+    origem         text    NOT NULL,   -- AUTO_EXTRA | AUTO_FOLGA | AJUSTE_MANUAL
+    criado_em      timestamp NOT NULL DEFAULT now()
+);
+CREATE INDEX ix_bh_colab_data ON banco_horas_mov (colaborador_id, data_ref);
+
+CREATE TABLE folga_compensacao (
+    id             serial PRIMARY KEY,
+    colaborador_id integer NOT NULL REFERENCES colaborador(id),
+    data_ref       date    NOT NULL,
+    minutos        integer NOT NULL CHECK (minutos > 0),
+    aprovada       boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE banco_horas_saldo (
+    colaborador_id integer PRIMARY KEY REFERENCES colaborador(id),
+    saldo_min      integer NOT NULL,
+    atualizado_em  timestamp NOT NULL DEFAULT now()
+);
