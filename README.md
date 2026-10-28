@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Banco de dados relacional (PostgreSQL) para controle de jornada e ponto eletrônico corporativo (REP-P): empregadores, colaboradores, escalas de trabalho, marcações de ponto (com geolocalização e biometria) e fechamento mensal de espelhos de ponto. O projeto segue a legislação trabalhista brasileira (CLT e Portaria 671/2021 do MTP), com scripts organizados por categoria (DDL, DML e DQL) e *stored procedures*.
+Banco de dados relacional (PostgreSQL) para controle de jornada e ponto eletrônico corporativo: empregadores, colaboradores, escalas de trabalho, marcações de ponto (com geolocalização e biometria) e fechamento mensal de espelhos de ponto. O projeto segue a legislação trabalhista brasileira (CLT e Portaria 671/2021 do MTP), com scripts organizados por categoria (DDL, DML e DQL) e *stored procedures*.
 
 ## Objetivo
 
