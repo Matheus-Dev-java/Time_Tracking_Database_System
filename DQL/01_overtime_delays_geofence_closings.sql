@@ -1,27 +1,27 @@
 -- =============================================================================
--- 01. Horas extras: saldo por colaborador (horas realizadas - carga prevista)
+-- 01. Horas extras: saldo por employee_name (horas realizadas - carga prevista)
 -- Regra: considera dias trabalhados, faltas e dias de folga trabalhados.
 --        Afastamentos, justificados e feriados não geram débito/crédito.
 -- =============================================================================
-SELECT e.id AS matricula,
-       e.name AS colaborador,
-       SUM(da.hours_worked) AS minutos_realizados,
-       SUM(da.hours_expected) AS minutos_previstos,
-       SUM(da.hours_worked - da.hours_expected)   AS saldo_minutos,
-       ROUND(SUM(da.hours_worked - da.hours_expected) / 60.0, 2) AS saldo_horas
+SELECT e.id AS employee_id,
+       e.name AS employee_name,
+       SUM(da.hours_worked) AS actual_minutes,
+       SUM(da.hours_expected) AS expected_minutes,
+       SUM(da.hours_worked - da.hours_expected)   AS balance_minutes,
+       ROUND(SUM(da.hours_worked - da.hours_expected) / 60.0, 2) AS balance_hours
 FROM daily_apurations da
 INNER JOIN employees e ON e.id = da.employee_id
 WHERE da.day_status IN ('WORKED', 'ABSENCE', 'DAY_OFF')
 GROUP BY e.id, e.name
-ORDER BY saldo_minutos DESC, e.name;
+ORDER BY balance_minutes DESC, e.name;
 
 -- =============================================================================
--- 02. Atrasos por departamento
+-- 02. Atrasos por department
 -- Regra: atraso = marcação de ENTRADA em dia trabalhado posterior ao horário
---        de entrada do turno acrescido da tolerância (shifts.tolerance_minutes).
+--        de entrada do shift acrescido da tolerância (shifts.tolerance_minutes).
 -- =============================================================================
-SELECT d.name AS departamento,
-       COUNT(late.punch_id) AS qtd_atrasos
+SELECT d.name AS department,
+       COUNT(late.punch_id) AS late_count
 FROM departments d
 LEFT JOIN (
     SELECT e.department_id, p.id AS punch_id
@@ -34,17 +34,17 @@ LEFT JOIN (
       AND p.punched_at::time > s.clock_in_time + s.tolerance_minutes * INTERVAL '1 minute'
 ) late ON late.department_id = d.id
 GROUP BY d.id, d.name
-ORDER BY qtd_atrasos DESC, d.name;
+ORDER BY late_count DESC, d.name;
 
 -- =============================================================================
 -- 03. Colaboradores com escala ativa e sem registro de ponto no dia
--- Regra: dia com jornada prevista (WORKED/ABSENCE), escala vigente na data e
---        nenhuma marcação em time_punches naquela data.
+-- Regra: dia com jornada prevista (WORKED/ABSENCE), escala vigente na record_date e
+--        nenhuma marcação em time_punches naquela record_date.
 -- =============================================================================
-SELECT e.id AS matricula,
-       e.name AS colaborador,
-       da.work_date AS data,
-       s.name AS turno
+SELECT e.id AS employee_id,
+       e.name AS employee_name,
+       da.work_date AS record_date,
+       s.name AS shift
 FROM daily_apurations da
 INNER JOIN employees e  ON e.id = da.employee_id
 INNER JOIN schedules sc ON sc.id = da.schedule_id AND da.work_date >= sc.start_dateAND da.work_date <= COALESCE(sc.end_date, DATE 'infinity')
@@ -62,15 +62,15 @@ ORDER BY da.work_date, e.name;
 -- =============================================================================
 -- 04. Marcações fora do perímetro permitido
 -- Regra: distância (Haversine) entre a coordenada da marcação e o centro da
---        filial do equipamento maior que branches.geofence_radius_m.
+--        branch do equipamento maior que branches.geofence_radius_m.
 --        Marcações sem coordenadas (REP-P físico) não são avaliadas.
 -- =============================================================================
-SELECT e.name AS colaborador,
-       p.punched_at::date AS data,
-       p.punch_type AS tipo_marcacao,
+SELECT e.name AS employee_name,
+       p.punched_at::date AS record_date,
+       p.punch_type AS punch_kind,
        p.latitude,
        p.longitude,
-       ROUND(g.meters::numeric)  AS distancia_metros, b.geofence_radius_m AS raio_permitido_metros
+       ROUND(g.meters::numeric)  AS distance_meters, b.geofence_radius_m AS allowed_radius_m
 FROM time_punches p
 INNER JOIN employees e ON e.id  = p.employee_id
 INNER JOIN clock_devices cd ON cd.id = p.clock_device_id
@@ -83,13 +83,13 @@ WHERE p.latitude IS NOT NULL
 ORDER BY p.punched_at;
 
 -- =============================================================================
--- 05. Fechamentos de espelho de ponto pendentes por empregador
+-- 05. Fechamentos de espelho de ponto pendentes por employer
 -- =============================================================================
-SELECT c.name AS empregador,
-       COUNT(ap.id) AS fechamentos_pendentes
+SELECT c.name AS employer,
+       COUNT(ap.id) AS pending_closings
 FROM companies c
 LEFT JOIN branches b ON b.company_id = c.id
 LEFT JOIN apuration_periods ap ON ap.branch_id = b.id 
 AND ap.is_closed = FALSE
 GROUP BY c.id, c.name
-ORDER BY fechamentos_pendentes DESC, c.name;
+ORDER BY pending_closings DESC, c.name;
