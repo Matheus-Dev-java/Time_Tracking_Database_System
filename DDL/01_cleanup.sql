@@ -1,0 +1,32 @@
+-- Drops views first, then tables with children before parents.
+DROP VIEW IF EXISTS vw_escalas_jornadas_vigentes;
+DROP VIEW IF EXISTS vw_demonstrativo_adicional_noturno;
+DROP VIEW IF EXISTS vw_relatorio_inconsistencias_ponto;
+DROP VIEW IF EXISTS vw_resumo_banco_horas_colaboradores;
+DROP VIEW IF EXISTS vw_espelho_ponto_detalhado;
+
+DROP TABLE IF EXISTS waiver_audit;
+DROP TABLE IF EXISTS absence_waiver;
+DROP TABLE IF EXISTS punch_adjustment;
+DROP TABLE IF EXISTS punch_audit;
+DROP TABLE IF EXISTS biometric_failure;
+DROP TABLE IF EXISTS timesheet;
+DROP TABLE IF EXISTS hour_bank_movement;
+DROP TABLE IF EXISTS hour_bank;
+DROP TABLE IF EXISTS daily_summary;
+DROP TABLE IF EXISTS time_punch;
+DROP TABLE IF EXISTS employee_schedule_history;
+DROP TABLE IF EXISTS work_schedule_day;
+DROP TABLE IF EXISTS work_schedule;
+DROP TABLE IF EXISTS device;
+DROP TABLE IF EXISTS employee;
+DROP TABLE IF EXISTS work_location;
+DROP TABLE IF EXISTS department;
+DROP TABLE IF EXISTS employer;
+DROP TABLE IF EXISTS job_title;
+DROP TABLE IF EXISTS waiver_type;
+DROP TABLE IF EXISTS adjustment_type;
+DROP TABLE IF EXISTS record_status;
+DROP TABLE IF EXISTS timesheet_status;
+DROP TABLE IF EXISTS punch_type;
+DROP TABLE IF EXISTS device_type;

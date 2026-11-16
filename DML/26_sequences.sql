@@ -1,0 +1,26 @@
+-- Moves every identity sequence past the identifiers inserted above.
+SELECT setval(pg_get_serial_sequence('device_type', 'device_type_id'), (SELECT MAX(device_type_id) FROM device_type));
+SELECT setval(pg_get_serial_sequence('punch_type', 'punch_type_id'), (SELECT MAX(punch_type_id) FROM punch_type));
+SELECT setval(pg_get_serial_sequence('timesheet_status', 'timesheet_status_id'), (SELECT MAX(timesheet_status_id) FROM timesheet_status));
+SELECT setval(pg_get_serial_sequence('record_status', 'record_status_id'), (SELECT MAX(record_status_id) FROM record_status));
+SELECT setval(pg_get_serial_sequence('adjustment_type', 'adjustment_type_id'), (SELECT MAX(adjustment_type_id) FROM adjustment_type));
+SELECT setval(pg_get_serial_sequence('waiver_type', 'waiver_type_id'), (SELECT MAX(waiver_type_id) FROM waiver_type));
+SELECT setval(pg_get_serial_sequence('job_title', 'job_title_id'), (SELECT MAX(job_title_id) FROM job_title));
+SELECT setval(pg_get_serial_sequence('employer', 'employer_id'), (SELECT MAX(employer_id) FROM employer));
+SELECT setval(pg_get_serial_sequence('department', 'department_id'), (SELECT MAX(department_id) FROM department));
+SELECT setval(pg_get_serial_sequence('work_location', 'work_location_id'), (SELECT MAX(work_location_id) FROM work_location));
+SELECT setval(pg_get_serial_sequence('employee', 'employee_id'), (SELECT MAX(employee_id) FROM employee));
+SELECT setval(pg_get_serial_sequence('device', 'device_id'), (SELECT MAX(device_id) FROM device));
+SELECT setval(pg_get_serial_sequence('work_schedule', 'work_schedule_id'), (SELECT MAX(work_schedule_id) FROM work_schedule));
+SELECT setval(pg_get_serial_sequence('work_schedule_day', 'work_schedule_day_id'), (SELECT MAX(work_schedule_day_id) FROM work_schedule_day));
+SELECT setval(pg_get_serial_sequence('employee_schedule_history', 'employee_schedule_history_id'), (SELECT MAX(employee_schedule_history_id) FROM employee_schedule_history));
+SELECT setval(pg_get_serial_sequence('time_punch', 'time_punch_id'), (SELECT MAX(time_punch_id) FROM time_punch));
+SELECT setval(pg_get_serial_sequence('daily_summary', 'daily_summary_id'), (SELECT MAX(daily_summary_id) FROM daily_summary));
+SELECT setval(pg_get_serial_sequence('hour_bank_movement', 'hour_bank_movement_id'), (SELECT MAX(hour_bank_movement_id) FROM hour_bank_movement));
+SELECT setval(pg_get_serial_sequence('hour_bank', 'hour_bank_id'), (SELECT MAX(hour_bank_id) FROM hour_bank));
+SELECT setval(pg_get_serial_sequence('timesheet', 'timesheet_id'), (SELECT MAX(timesheet_id) FROM timesheet));
+SELECT setval(pg_get_serial_sequence('biometric_failure', 'biometric_failure_id'), (SELECT MAX(biometric_failure_id) FROM biometric_failure));
+SELECT setval(pg_get_serial_sequence('punch_audit', 'punch_audit_id'), (SELECT MAX(punch_audit_id) FROM punch_audit));
+SELECT setval(pg_get_serial_sequence('punch_adjustment', 'punch_adjustment_id'), (SELECT MAX(punch_adjustment_id) FROM punch_adjustment));
+SELECT setval(pg_get_serial_sequence('absence_waiver', 'absence_waiver_id'), (SELECT MAX(absence_waiver_id) FROM absence_waiver));
+SELECT setval(pg_get_serial_sequence('waiver_audit', 'waiver_audit_id'), (SELECT MAX(waiver_audit_id) FROM waiver_audit));
